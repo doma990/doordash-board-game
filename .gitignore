@@ -1,0 +1,9 @@
+/bin/
+/target/
+.DS_Store
+Thumbs.db
+*.class
+*.log
+.idea/
+*.iml
+.vscode/
