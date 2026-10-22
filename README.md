@@ -1,6 +1,6 @@
 # DooRDasH
 
-**Scare vs Laugh Touchdown** — a turn-based JavaFX board game inspired by *Monsters, Inc.*, developed for CSEN 401 at the German University in Cairo.
+**Scare vs Laugh Touchdown** — a turn-based JavaFX board game inspired by *Monsters, Inc.*, developed for my CSEN 401 project at the German University in Cairo.
 
 The project brings together three levels of software design: **an object-oriented class model, a tested game engine, and an interactive JavaFX interface**.
 
