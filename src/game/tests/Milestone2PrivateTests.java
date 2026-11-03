@@ -76,13 +76,9 @@ public class Milestone2PrivateTests {
 	@Test(timeout = 2000)
 	public void testPlayTurnSwitchesTurnWhenNotFrozen() {
 		try {
-			Class<?> roleClass = Class.forName(rolePath);
-			
-			Enum<?> scarerRole = Enum.valueOf((Class<Enum>) roleClass, "SCARER");
-
 			Class<?> gameClass = Class.forName(gamePath);
-			Constructor<?> gameConstructor = gameClass.getConstructor(roleClass);
-			Object gameObject = gameConstructor.newInstance(scarerRole);
+			// The fixture gives the current player a normal-speed monster.
+			Object gameObject = createGameForTesting();
 
 			Method getCurrent = gameClass.getMethod("getCurrent");
 			Method getOpponent = gameClass.getMethod("getOpponent");
@@ -96,9 +92,8 @@ public class Milestone2PrivateTests {
 			Method setFrozen = monsterClass.getMethod("setFrozen", boolean.class);
 			setFrozen.invoke(currentBefore, false);
 			
-			// Use safe fixed positions to avoid random InvalidMoveException paths.
-			// From position 95, any roll in [1..6] cannot collide with opponent at 50.
-			setPosition.invoke(currentBefore, 95);
+			// Every roll from 91 lands on a corridor or door (92-97), clear of the opponent.
+			setPosition.invoke(currentBefore, 91);
 			setPosition.invoke(opponent, 50);
 
 			int posBefore = (int) getPosition.invoke(currentBefore);
@@ -111,8 +106,8 @@ public class Milestone2PrivateTests {
 
 			assertNotSame("When current is not frozen, playTurn should switch to the other monster",
 					currentBefore, currentAfter);
-			assertTrue("playTurn should move the current monster forward (position must change when move is valid)",
-					posAfter != posBefore);
+			int diceRoll = (int) gameClass.getMethod("getLastDiceRoll").invoke(gameObject);
+			assertEquals("playTurn should move the current monster by the dice roll", posBefore + diceRoll, posAfter);
 		} catch (Exception e) {
 			fail("Unexpected exception in testPlayTurnSwitchesTurnWhenNotFrozen: " + e.getClass().getSimpleName()
 					+ " - " + e.getMessage());
