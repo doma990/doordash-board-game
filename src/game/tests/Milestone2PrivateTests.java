@@ -27,6 +27,8 @@ import java.util.Random;
 
 import org.junit.Test;
 
+import game.engine.monsters.MultiTasker;
+
 
 public class Milestone2PrivateTests {
 
@@ -95,10 +97,13 @@ public class Milestone2PrivateTests {
 			// Ensure current is not frozen
 			Method setFrozen = monsterClass.getMethod("setFrozen", boolean.class);
 			setFrozen.invoke(currentBefore, false);
+			// A MultiTasker needs focus to move on a roll of 1.
+			if (currentBefore instanceof MultiTasker multiTasker) {
+				multiTasker.setNormalSpeedTurns(1);
+			}
 			
-			// Use safe fixed positions to avoid random InvalidMoveException paths.
-			// From position 95, any roll in [1..6] cannot collide with opponent at 50.
-			setPosition.invoke(currentBefore, 95);
+			// Every roll from 91 lands on a corridor or door (92-97), clear of the opponent.
+			setPosition.invoke(currentBefore, 91);
 			setPosition.invoke(opponent, 50);
 
 			int posBefore = (int) getPosition.invoke(currentBefore);
@@ -111,8 +116,8 @@ public class Milestone2PrivateTests {
 
 			assertNotSame("When current is not frozen, playTurn should switch to the other monster",
 					currentBefore, currentAfter);
-			assertTrue("playTurn should move the current monster forward (position must change when move is valid)",
-					posAfter != posBefore);
+			int diceRoll = (int) gameClass.getMethod("getLastDiceRoll").invoke(gameObject);
+			assertEquals("playTurn should move the current monster by the dice roll", posBefore + diceRoll, posAfter);
 		} catch (Exception e) {
 			fail("Unexpected exception in testPlayTurnSwitchesTurnWhenNotFrozen: " + e.getClass().getSimpleName()
 					+ " - " + e.getMessage());
