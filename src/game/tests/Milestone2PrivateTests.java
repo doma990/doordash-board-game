@@ -27,8 +27,6 @@ import java.util.Random;
 
 import org.junit.Test;
 
-import game.engine.monsters.MultiTasker;
-
 
 public class Milestone2PrivateTests {
 
@@ -78,13 +76,9 @@ public class Milestone2PrivateTests {
 	@Test(timeout = 2000)
 	public void testPlayTurnSwitchesTurnWhenNotFrozen() {
 		try {
-			Class<?> roleClass = Class.forName(rolePath);
-			
-			Enum<?> scarerRole = Enum.valueOf((Class<Enum>) roleClass, "SCARER");
-
 			Class<?> gameClass = Class.forName(gamePath);
-			Constructor<?> gameConstructor = gameClass.getConstructor(roleClass);
-			Object gameObject = gameConstructor.newInstance(scarerRole);
+			// The fixture gives the current player a normal-speed monster.
+			Object gameObject = createGameForTesting();
 
 			Method getCurrent = gameClass.getMethod("getCurrent");
 			Method getOpponent = gameClass.getMethod("getOpponent");
@@ -97,10 +91,6 @@ public class Milestone2PrivateTests {
 			// Ensure current is not frozen
 			Method setFrozen = monsterClass.getMethod("setFrozen", boolean.class);
 			setFrozen.invoke(currentBefore, false);
-			// A MultiTasker needs focus to move on a roll of 1.
-			if (currentBefore instanceof MultiTasker multiTasker) {
-				multiTasker.setNormalSpeedTurns(1);
-			}
 			
 			// Every roll from 91 lands on a corridor or door (92-97), clear of the opponent.
 			setPosition.invoke(currentBefore, 91);
